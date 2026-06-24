@@ -1,0 +1,58 @@
+.app-header {
+  background: linear-gradient(135deg, rgba(102,126,234,0.95) 0%, rgba(118,75,162,0.95) 100%);
+  color: white;
+  padding: 34px 20px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 30px rgba(17,24,39,0.06);
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-content {
+  text-align: center;
+}
+
+.app-title {
+  font-size: 40px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.title-icon {
+  font-size: 48px;
+}
+
+.app-subtitle {
+  font-size: 16px;
+  margin: 0;
+  opacity: 0.95;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 30px 20px;
+    margin-bottom: 30px;
+  }
+
+  .app-title {
+    font-size: 32px;
+    gap: 10px;
+  }
+
+  .title-icon {
+    font-size: 36px;
+  }
+
+  .app-subtitle {
+    font-size: 16px;
+  }
+}

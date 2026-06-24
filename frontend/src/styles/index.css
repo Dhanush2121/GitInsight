@@ -1,0 +1,120 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+:root{
+  --bg: #f5f7fa;
+  --muted: #6b7280;
+  --text: #111827;
+  --accent-1: #667eea;
+  --accent-2: #764ba2;
+  --card: #ffffff;
+  --card-border: #e6e9ef;
+  --glass: rgba(255,255,255,0.6);
+  --shadow-1: 0 6px 18px rgba(17,24,39,0.06);
+  --shadow-2: 0 12px 30px rgba(17,24,39,0.08);
+  --radius: 12px;
+}
+
+/* Layout helpers */
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* Generic card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+  transition: box-shadow 0.25s ease, transform 0.18s ease;
+}
+
+.card:hover{ transform: translateY(-6px); box-shadow: var(--shadow-2); }
+
+/* Buttons */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight:600;
+}
+
+.btn.primary{
+  background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  color: white;
+  border: none;
+}
+
+.muted { color: var(--muted); }
+
+/* utility spacing */
+.mb-12{ margin-bottom:12px }
+.mb-16{ margin-bottom:16px }
+.mt-12{ margin-top:12px }
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
+}
+
+/* Selection Styling */
+::selection {
+  background-color: #667eea;
+  color: white;
+}
+
+::-moz-selection {
+  background-color: #667eea;
+  color: white;
+}

@@ -1,0 +1,185 @@
+{
+  "info": {
+    "name": "GitHub Profile Analyzer API - Hierarchical",
+    "description": "Organized API collection for GitHub Profile Analyzer with hierarchical folder structure",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GitHub Profiles",
+      "item": [
+        {
+          "name": "Analysis",
+          "item": [
+            {
+              "name": "Analyze GitHub Profile",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{base_url}}/github/analyze/{{username}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "5000",
+                  "path": ["api", "github", "analyze", "{{username}}"]
+                },
+                "description": "Analyzes a GitHub user profile and saves to database"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Retrieval",
+          "item": [
+            {
+              "name": "Get All Profiles",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/github/profiles",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "5000",
+                  "path": ["api", "github", "profiles"]
+                },
+                "description": "Fetches all analyzed profiles from database"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Single Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/github/profiles/{{username}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "5000",
+                  "path": ["api", "github", "profiles", "{{username}}"]
+                },
+                "description": "Fetches a specific profile by username with repositories"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Rankings",
+          "item": [
+            {
+              "name": "Get Top Followed Profiles",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/github/top-followed?limit=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "5000",
+                  "path": ["api", "github", "top-followed"],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Number of profiles to return"
+                    }
+                  ]
+                },
+                "description": "Gets top followed profiles ranked by follower count"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Top Starred Profiles",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/github/top-starred?limit=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "5000",
+                  "path": ["api", "github", "top-starred"],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Number of profiles to return"
+                    }
+                  ]
+                },
+                "description": "Gets top starred profiles ranked by total stars"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Management",
+          "item": [
+            {
+              "name": "Delete Profile",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/github/profiles/{{username}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "5000",
+                  "path": ["api", "github", "profiles", "{{username}}"]
+                },
+                "description": "Deletes a profile and associated repositories from database"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "username",
+      "value": "torvalds",
+      "type": "string"
+    }
+  ]
+}
