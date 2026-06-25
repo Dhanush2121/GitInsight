@@ -1,179 +1,308 @@
 # GitHub Profile Analyzer
 
-A full-stack web application that analyzes GitHub user profiles, generates useful insights, and stores data in MySQL.
+A full-stack web application that analyzes GitHub user profiles, stores profile data in MySQL, and exposes a backend API for analytics and retrieval.
 
-## 🚀 Features
+## 🚀 Project Focus
 
-- **GitHub Profile Analysis**: Analyze any GitHub user's profile using the GitHub Public API
-- **Comprehensive Metrics**: Calculate and display detailed insights about developers
-- **Database Persistence**: Store analyzed profiles in MySQL for easy retrieval
-- **Search History**: View previously analyzed profiles
-- **Advanced Statistics**: Filter by most followed or most starred profiles
-- **Responsive Design**: Beautiful, modern, and fully responsive UI
-- **Real-time Updates**: Auto-update profiles with latest GitHub data
-- **REST API**: Complete REST API for programmatic access
+This repository includes:
+- `backend/` — Express API, GitHub integration, MySQL persistence
+- `frontend/` — React app that consumes backend API
 
-## 📊 Calculated Insights
+The backend is the heart of the app: it fetches GitHub data, calculates insights, saves profiles, and serves REST endpoints.
 
-- Total Stars
-- Total Forks
-- Most Used Programming Language
-- Account Age (in days)
-- Average Stars per Repository
-- Follower/Following Ratio
-- Public Gists
-- Company, Location, Blog, Twitter info
+---
 
-## 📋 Prerequisites
+## 🧠 Backend Overview
 
-- Node.js (v14 or higher)
-- npm or yarn
-- MySQL (v5.7 or higher)
-- Git
+### Main backend files
 
-## 🛠️ Tech Stack
+- `backend/server.js` — Express server entry point
+- `backend/config/database.js` — MySQL connection pool
+- `backend/config/constants.js` — API constants and error messages
+- `backend/controllers/githubController.js` — route handlers and business logic
+- `backend/models/Profile.js` — database queries for profiles and repositories
+- `backend/routes/github.js` — GitHub-related REST routes
+- `backend/routes/health.js` — health check route
+- `backend/utils/githubService.js` — GitHub API integration and metrics calculation
+- `backend/middleware/errorHandler.js` — centralized error response handling
+- `backend/schema.sql` — MySQL table definitions
 
-**Backend:**
+### Backend stack
+
 - Node.js
 - Express.js
-- MySQL2 (Promise-based MySQL client)
-- Axios (HTTP client)
-- dotenv (Environment variables)
+- MySQL2
+- Axios
+- dotenv
 
-**Frontend:**
-- React 18
-- Axios (HTTP client)
-- CSS3 (Modern styling)
+---
 
-**Database:**
-- MySQL
+## 🔌 Backend API Endpoints
 
-**Architecture:**
-- MVC (Model-View-Controller) pattern
+All endpoints are mounted under `/api`.
 
-## 📁 Project Structure
+### Health check
 
+- `GET /api/health`
+- Response: status `200` with JSON success message
+
+### Analyze GitHub user
+
+- `POST /api/github/analyze/:username`
+- Description: fetch GitHub profile + repos, calculate insights, save or update the profile in MySQL
+- Response:
+  - `success: true`
+  - `message: 'Profile analyzed and saved successfully'` or `Profile updated successfully`
+  - `data`: profile object
+
+### Get all analyzed profiles
+
+- `GET /api/github/profiles`
+- Description: returns all stored profiles sorted by last analysis time
+- Response: `data` contains list of profiles
+
+### Get a single profile
+
+- `GET /api/github/profiles/:username`
+- Description: returns profile and repository details for one GitHub username
+
+### Get top followed profiles
+
+- `GET /api/github/top-followed?limit=10`
+- Description: returns profiles ordered by `followers` descending
+- Query param: `limit` (optional, default `10`)
+
+### Get top starred profiles
+
+- `GET /api/github/top-starred?limit=10`
+- Description: returns profiles ordered by `total_stars` descending
+- Query param: `limit` (optional, default `10`)
+
+### Delete a profile
+
+- `DELETE /api/github/profiles/:username`
+- Description: removes profile and associated repositories from MySQL
+
+---
+
+## 🗄️ Database Schema
+
+### `github_profiles`
+
+Stores analyzed GitHub profile metadata and computed insights.
+
+Columns:
+- `id` — auto-increment primary key
+- `username` — GitHub login, unique
+- `name`
+- `bio`
+- `avatar_url`
+- `profile_url`
+- `public_repos`
+- `followers`
+- `following`
+- `account_age_days`
+- `total_stars`
+- `total_forks`
+- `most_used_language`
+- `avg_stars_per_repo`
+- `follower_following_ratio`
+- `location`
+- `company`
+- `blog`
+- `twitter_username`
+- `public_gists`
+- `created_at`
+- `analyzed_at`
+
+Indexes:
+- `idx_username`
+- `idx_followers`
+- `idx_total_stars`
+- `idx_analyzed_at`
+
+### `github_repositories`
+
+Stores top repositories for each analyzed profile.
+
+Columns:
+- `id`
+- `profile_username` — foreign key to `github_profiles(username)`
+- `repo_name`
+- `repo_url`
+- `description`
+- `stars`
+- `forks`
+- `language`
+- `is_fork`
+- `created_at`
+
+Indexes:
+- `idx_profile_username`
+- `idx_stars`
+- Unique key: `(profile_username, repo_name)`
+
+Foreign key:
+- `fk_profile` enforces cascade delete when a profile is removed
+
+---
+
+## ⚙️ Backend Operation Details
+
+### Profile analysis flow
+
+1. Client calls `POST /api/github/analyze/:username`
+2. `githubController.analyzeProfile()` validates the username
+3. `githubService.getGithubUserData()` calls GitHub API:
+   - `GET https://api.github.com/users/:username`
+   - `GET https://api.github.com/users/:username/repos` (paginated)
+4. The backend calculates metrics:
+   - total stars
+   - total forks
+   - most used language
+   - account age in days
+   - average stars per repo
+   - follower/following ratio
+5. The profile is inserted or updated in `github_profiles`
+6. Top 10 repos by stars are saved into `github_repositories`
+
+### Data returned by the backend
+
+The backend returns a profile object with fields such as:
+- `username`
+- `name`
+- `bio`
+- `avatar_url`
+- `profile_url`
+- `public_repos`
+- `followers`
+- `following`
+- `account_age_days`
+- `total_stars`
+- `total_forks`
+- `most_used_language`
+- `avg_stars_per_repo`
+- `follower_following_ratio`
+- `location`
+- `company`
+- `blog`
+- `twitter_username`
+- `public_gists`
+- `repositories`
+
+The frontend consumes these fields and renders profile cards, statistics, and a leaderboard.
+
+---
+
+## 🛠️ Environment Variables
+
+Create `backend/.env` and define:
+
+```env
+PORT=5000
+NODE_ENV=development
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=github_analyzer
+
+FRONTEND_URL=http://localhost:3000
 ```
-GitHub-Profile-Analyzer/
-├── backend/
-│   ├── config/
-│   │   ├── database.js          # MySQL connection pool
-│   │   └── constants.js         # Constants and error messages
-│   ├── controllers/
-│   │   └── githubController.js  # API request handlers
-│   ├── models/
-│   │   └── Profile.js           # Database operations
-│   ├── routes/
-│   │   ├── github.js            # GitHub API routes
-│   │   └── health.js            # Health check route
-│   ├── middleware/
-│   │   └── errorHandler.js      # Error handling middleware
-│   ├── utils/
-│   │   └── githubService.js     # GitHub API integration logic
-│   ├── server.js                # Main server file
-│   ├── package.json
-│   ├── .env.example
-│   └── schema.sql               # Database schema
-│
-├── frontend/
-│   ├── public/
-│   │   └── index.html
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Header.js
-│   │   │   ├── SearchSection.js
-│   │   │   ├── ProfileCard.js
-│   │   │   ├── InsightsDashboard.js
-│   │   │   ├── ProfilesTable.js
-│   │   │   ├── Statistics.js
-│   │   │   └── Alert.js
-│   │   ├── pages/
-│   │   │   └── Dashboard.js
-│   │   ├── services/
-│   │   │   └── api.js
-│   │   ├── styles/
-│   │   │   ├── index.css
-│   │   │   ├── SearchSection.css
-│   │   │   ├── ProfileCard.css
-│   │   │   ├── InsightsDashboard.css
-│   │   │   ├── ProfilesTable.css
-│   │   │   ├── Statistics.css
-│   │   │   ├── Header.css
-│   │   │   ├── Alert.css
-│   │   │   └── Dashboard.css
-│   │   ├── App.js
-│   │   └── index.js
-│   ├── package.json
-│   └── .env.example
-│
-├── .gitignore
-├── README.md
-└── GitHub-Profile-Analyzer.postman_collection.json
-```
 
-## 🚀 Installation & Setup
+### Notes
+- `PORT` is used by Render if deployed
+- `DB_*` values connect to MySQL
+- `FRONTEND_URL` is used by CORS to allow your frontend origin
 
-### 1. Clone the Repository
+---
 
-```bash
-cd Git-Analyse
-```
+## 🔧 Backend Setup and Run
 
-### 2. Setup Database
-
-```bash
-# Open MySQL CLI
-mysql -u root -p
-
-# Run the schema file
-source backend/schema.sql;
-
-# Exit MySQL
-exit;
-```
-
-### 3. Setup Backend
+### Install dependencies
 
 ```bash
 cd backend
-
-# Install dependencies
 npm install
-
-# Create .env file from .env.example
-cp .env.example .env
-
-# Edit .env with your MySQL credentials
-# DB_HOST=localhost
-# DB_USER=root
-# DB_PASSWORD=your_password
-# DB_NAME=github_analyzer
-
-# Start the server
-npm run dev
-# or
-npm start
 ```
 
-The backend will start on `http://localhost:5000`
-
-### 4. Setup Frontend
-
-Open a new terminal:
+### Run locally
 
 ```bash
-cd frontend
+npm run dev
+```
 
-# Install dependencies
-npm install
+### Production start
 
-# Create .env file from .env.example
-cp .env.example .env
-
-# Start the development server
+```bash
 npm start
 ```
 
-The frontend will open at `http://localhost:3000`
+### Backend health check
+
+Once running, verify the backend with:
+
+```bash
+curl http://localhost:5000/api/health
+```
+
+---
+
+## 📦 Deployment Notes
+
+### Render backend
+- Deploy the `backend/` folder as a Node.js web service
+- Start command: `npm start`
+- Ensure environment variables are configured on Render
+- Set `FRONTEND_URL` to your deployed frontend origin
+
+### Vercel frontend
+- Deploy the `frontend/` folder
+- Set `REACT_APP_API_URL` to `https://<your-backend>.onrender.com/api`
+- The frontend uses this variable to call the backend
+
+---
+
+## 🔍 Troubleshooting
+
+### CORS issues
+- Ensure `FRONTEND_URL` on backend matches exactly your deployed frontend URL
+- Example: `https://your-app.vercel.app`
+
+### Wrong backend path
+- `REACT_APP_API_URL` must include `/api`
+- Example: `https://gitinsight-hiay.onrender.com/api`
+
+### Database errors
+- Confirm `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` are correct
+- Make sure `backend/schema.sql` has been executed
+
+---
+
+## 📁 Frontend Summary
+
+Frontend is a Create React App that consumes the backend API via `frontend/src/services/api.js`.
+
+Key files:
+- `frontend/src/pages/Dashboard.js` — main app logic and API calls
+- `frontend/src/components/SearchSection.js` — GitHub username form
+- `frontend/src/services/api.js` — Axios wrapper for backend requests
+
+---
+
+## ✅ Quick Start Summary
+
+1. Run MySQL and import `backend/schema.sql`
+2. Configure `backend/.env`
+3. `cd backend && npm install && npm run dev`
+4. `cd frontend && npm install && npm start`
+5. Use the app at `http://localhost:3000`
+
+---
+
+## 📌 License
+
+Dhanush2121
 
 
