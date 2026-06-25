@@ -13,11 +13,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://localhost:3000',
+];
+
+if (process.env.FRONTEND_URL) {
+  const normalizedFrontendUrl = process.env.FRONTEND_URL.replace(/\/+$/, '');
+  allowedOrigins.push(normalizedFrontendUrl);
+}
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS policy does not allow access from ${origin}`));
+  },
   credentials: true,
 }));
-
 
 app.use('/api/github', githubRoutes);
 app.use('/api', healthRoutes);
